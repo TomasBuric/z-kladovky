@@ -1,0 +1,118 @@
+
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { CheckCircle2, Phone, Mail, MapPin, ArrowRight, ShieldCheck, Ruler, CalendarDays, HardHat, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+const services = [
+  { icon: Ruler, title: "Zaměření a příprava", text: "Kontrola podkladů, vytyčení stavby a návrh správného postupu realizace." },
+  { icon: HardHat, title: "Kompletní realizace", text: "Zemní práce, podsypy, bednění, prostupy, výztuž i betonáž v jednom termínu." },
+  { icon: ShieldCheck, title: "Převzetí bez starostí", text: "Průběžná kontrola, fotodokumentace a předání připravené desky pro další etapu." },
+];
+
+const steps = ["Pošlete projekt nebo základní rozměry", "Domluvíme zaměření a přesný rozsah", "Dostanete položkovou cenovou nabídku", "Zrealizujeme desku a předáme hotové dílo"];
+
+export default function ZakladProWebsite() {
+  const [menu, setMenu] = useState(false);
+  const [area, setArea] = useState(120);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const estimate = useMemo(() => {
+    const a = Math.max(20, Number(area) || 0);
+    return { low: Math.round(a * 4200 / 10000) * 10000, high: Math.round(a * 5900 / 10000) * 10000 };
+  }, [area]);
+
+  const submit = (e) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Poptávka základové desky – ${name || "nový zákazník"}`);
+    const body = encodeURIComponent(`Jméno: ${name}\nTelefon: ${phone}\nE-mail: ${email}\nPlocha: ${area} m²\n\n${message}`);
+    window.location.href = `mailto:poptavky@zakladpro.cz?subject=${subject}&body=${body}`;
+    setSent(true);
+  };
+
+  const money = (v) => new Intl.NumberFormat("cs-CZ", { style: "currency", currency: "CZK", maximumFractionDigits: 0 }).format(v);
+
+  return (
+    <div className="min-h-screen bg-stone-50 text-stone-900">
+      <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-stone-50/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+          <a href="#uvod" className="flex items-center gap-3 font-black tracking-tight text-xl">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-orange-600 text-white"><HardHat size={22}/></span>
+            ZÁKLAD<span className="text-orange-600">PRO</span>
+          </a>
+          <nav className="hidden items-center gap-7 text-sm font-semibold md:flex">
+            <a className="hover:text-orange-600" href="#sluzby">Služby</a>
+            <a className="hover:text-orange-600" href="#postup">Jak pracujeme</a>
+            <a className="hover:text-orange-600" href="#kalkulace">Orientační cena</a>
+            <a className="hover:text-orange-600" href="#kontakt">Kontakt</a>
+            <Button asChild className="rounded-xl bg-orange-600 hover:bg-orange-700"><a href="tel:+420777123456"><Phone className="mr-2 h-4 w-4"/>+420 777 123 456</a></Button>
+          </nav>
+          <button className="md:hidden" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X/> : <Menu/>}</button>
+        </div>
+        {menu && <nav className="grid gap-4 border-t bg-white px-5 py-5 text-sm font-semibold md:hidden">
+          <a onClick={()=>setMenu(false)} href="#sluzby">Služby</a><a onClick={()=>setMenu(false)} href="#postup">Jak pracujeme</a><a onClick={()=>setMenu(false)} href="#kalkulace">Orientační cena</a><a onClick={()=>setMenu(false)} href="#kontakt">Kontakt</a>
+        </nav>}
+      </header>
+
+      <main>
+        <section id="uvod" className="relative overflow-hidden bg-stone-900 text-white">
+          <div className="absolute inset-0 opacity-20" style={{backgroundImage:"linear-gradient(30deg, #ea580c 12%, transparent 12.5%, transparent 87%, #ea580c 87.5%, #ea580c), linear-gradient(150deg, #ea580c 12%, transparent 12.5%, transparent 87%, #ea580c 87.5%, #ea580c)", backgroundSize:"80px 140px"}} />
+          <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 lg:grid-cols-2 lg:px-8 lg:py-28">
+            <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.55}}>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-400/30 bg-orange-500/10 px-4 py-2 text-sm font-semibold text-orange-300"><CheckCircle2 size={16}/> Pevný základ pro každý dům</div>
+              <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">Základové desky<br/><span className="text-orange-500">na klíč</span></h1>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-stone-300">Od výkopu po finální betonáž. Jasný rozpočet, domluvený termín a jedna firma odpovědná za celý základ vašeho domu.</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="rounded-xl bg-orange-600 px-6 hover:bg-orange-700"><a href="#kontakt">Nezávazná poptávka <ArrowRight className="ml-2 h-5 w-5"/></a></Button>
+                <Button asChild size="lg" variant="outline" className="rounded-xl border-stone-600 bg-transparent text-white hover:bg-white hover:text-stone-900"><a href="tel:+420777123456"><Phone className="mr-2 h-5 w-5"/>Zavolat technikovi</a></Button>
+              </div>
+              <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-stone-300">
+                <span className="flex items-center gap-2"><CheckCircle2 className="text-orange-500" size={18}/>Položková nabídka</span>
+                <span className="flex items-center gap-2"><CheckCircle2 className="text-orange-500" size={18}/>Fotodokumentace</span>
+                <span className="flex items-center gap-2"><CheckCircle2 className="text-orange-500" size={18}/>Smluvený termín</span>
+              </div>
+            </motion.div>
+            <div className="relative">
+              <div className="aspect-[4/3] overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-stone-700 via-stone-800 to-orange-950 p-8 shadow-2xl">
+                <div className="flex h-full flex-col justify-between rounded-2xl border border-dashed border-orange-400/50 bg-stone-950/40 p-7">
+                  <div className="flex items-center justify-between"><span className="text-sm font-bold uppercase tracking-[.2em] text-orange-400">Realizace bez komplikací</span><Ruler className="text-orange-400"/></div>
+                  <div>
+                    <div className="mb-3 h-3 w-4/5 rounded bg-stone-500/50"/><div className="mb-3 h-3 w-2/3 rounded bg-stone-500/40"/><div className="grid grid-cols-5 gap-2 pt-5">{[1,2,3,4,5].map(i=><div key={i} className="h-20 rounded-t bg-gradient-to-t from-orange-700 to-orange-500" style={{height:`${45+i*10}px`}}/>)}</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 text-center text-xs text-stone-300"><div><b className="block text-lg text-white">1</b>dodavatel</div><div><b className="block text-lg text-white">100 %</b>přehled</div><div><b className="block text-lg text-white">0</b>výmluv</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sluzby" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="max-w-2xl"><p className="font-bold uppercase tracking-widest text-orange-600">Co zajistíme</p><h2 className="mt-3 text-3xl font-black sm:text-4xl">Celá základová deska pod jednou odpovědností</h2><p className="mt-4 text-stone-600">Koordinujeme práce i materiál tak, aby na sebe jednotlivé kroky navazovaly a stavba zbytečně nestála.</p></div>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">{services.map(({icon:Icon,title,text})=><Card key={title} className="rounded-2xl border-stone-200 shadow-sm"><CardContent className="p-7"><span className="mb-5 grid h-12 w-12 place-items-center rounded-xl bg-orange-100 text-orange-700"><Icon/></span><h3 className="text-xl font-bold">{title}</h3><p className="mt-3 leading-7 text-stone-600">{text}</p></CardContent></Card>)}</div>
+        </section>
+
+        <section id="postup" className="bg-white py-20"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]"><div><p className="font-bold uppercase tracking-widest text-orange-600">Jednoduchý postup</p><h2 className="mt-3 text-3xl font-black sm:text-4xl">Od projektu k hotové desce</h2><p className="mt-4 leading-7 text-stone-600">Na začátku si přesně vyjasníme rozsah. Díky tomu víte, co je v ceně, kdy začneme a co od vás potřebujeme.</p></div><div className="grid gap-4 sm:grid-cols-2">{steps.map((s,i)=><div key={s} className="flex gap-4 rounded-2xl bg-stone-50 p-5"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-stone-900 font-black text-white">{i+1}</span><p className="pt-1 font-semibold leading-6">{s}</p></div>)}</div></div></div></section>
+
+        <section id="kalkulace" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="grid overflow-hidden rounded-[2rem] bg-stone-900 text-white shadow-xl lg:grid-cols-2">
+            <div className="p-8 sm:p-12"><p className="font-bold uppercase tracking-widest text-orange-400">Rychlá orientace</p><h2 className="mt-3 text-3xl font-black">Kolik může deska stát?</h2><p className="mt-4 leading-7 text-stone-300">Zadejte přibližnou plochu domu. Výpočet je pouze orientační, přesná cena závisí na projektu, podloží, svažitosti, dopravě a rozsahu přípojek.</p><label className="mt-8 block text-sm font-bold" htmlFor="area">Plocha základové desky</label><div className="mt-2 flex items-center gap-3"><Input id="area" type="number" min="20" value={area} onChange={e=>setArea(e.target.value)} className="h-12 border-stone-600 bg-stone-800 text-lg text-white"/><span className="font-bold">m²</span></div></div>
+            <div className="flex flex-col justify-center bg-orange-600 p-8 sm:p-12"><p className="text-sm font-bold uppercase tracking-widest text-orange-100">Orientační rozpětí</p><p className="mt-3 text-3xl font-black sm:text-4xl">{money(estimate.low)} – {money(estimate.high)}</p><p className="mt-4 text-orange-50">Nejde o závaznou nabídku. Pro přesnou kalkulaci nám pošlete projektovou dokumentaci nebo základní rozměry a místo realizace.</p><Button asChild className="mt-7 w-fit rounded-xl bg-white text-stone-900 hover:bg-orange-50"><a href="#kontakt">Chci přesnou nabídku</a></Button></div>
+          </div>
+        </section>
+
+        <section id="kontakt" className="bg-white py-20"><div className="mx-auto grid max-w-7xl gap-12 px-5 lg:grid-cols-2 lg:px-8"><div><p className="font-bold uppercase tracking-widest text-orange-600">Nezávazná poptávka</p><h2 className="mt-3 text-3xl font-black sm:text-4xl">Pošlete nám rozměry nebo projekt</h2><p className="mt-4 max-w-xl leading-7 text-stone-600">Ozveme se, doplníme potřebné informace a navrhneme další postup. Čím přesnější podklady pošlete, tím přesnější bude první odhad.</p><div className="mt-8 grid gap-4 text-sm"><a href="tel:+420777123456" className="flex items-center gap-3 font-bold"><span className="grid h-10 w-10 place-items-center rounded-xl bg-orange-100 text-orange-700"><Phone size={19}/></span>+420 777 123 456</a><a href="mailto:poptavky@zakladpro.cz" className="flex items-center gap-3 font-bold"><span className="grid h-10 w-10 place-items-center rounded-xl bg-orange-100 text-orange-700"><Mail size={19}/></span>poptavky@zakladpro.cz</a><div className="flex items-center gap-3 font-bold"><span className="grid h-10 w-10 place-items-center rounded-xl bg-orange-100 text-orange-700"><MapPin size={19}/></span>Realizace dle dohody</div></div></div>
+          <form onSubmit={submit} className="grid gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm sm:p-8"><div className="grid gap-4 sm:grid-cols-2"><Input required placeholder="Jméno a příjmení" value={name} onChange={e=>setName(e.target.value)} className="h-12 bg-white"/><Input required placeholder="Telefon" value={phone} onChange={e=>setPhone(e.target.value)} className="h-12 bg-white"/></div><Input type="email" required placeholder="E-mail" value={email} onChange={e=>setEmail(e.target.value)} className="h-12 bg-white"/><Input type="number" min="20" placeholder="Plocha desky v m²" value={area} onChange={e=>setArea(e.target.value)} className="h-12 bg-white"/><Textarea required placeholder="Místo realizace, typ domu a co už máte připravené..." value={message} onChange={e=>setMessage(e.target.value)} className="min-h-32 bg-white"/><Button type="submit" className="h-12 rounded-xl bg-orange-600 font-bold hover:bg-orange-700">Odeslat poptávku <ArrowRight className="ml-2 h-4 w-4"/></Button>{sent && <p className="text-sm font-semibold text-green-700">Otevřeli jsme připravený e-mail. Stačí jej odeslat.</p>}<p className="text-xs leading-5 text-stone-500">Odesláním souhlasíte s použitím uvedených údajů pouze pro vyřízení vaší poptávky.</p></form>
+        </div></section>
+      </main>
+
+      <footer className="bg-stone-950 text-stone-400"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8 text-sm sm:flex-row sm:items-center sm:justify-between lg:px-8"><div><b className="text-white">ZÁKLAD<span className="text-orange-500">PRO</span></b><span className="ml-3">Základové desky na klíč</span></div><div>© 2026 ZákladPro · IČO doplnit · Ochrana osobních údajů</div></div></footer>
+    </div>
+  );
+}
